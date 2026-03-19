@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate, useParams } from "react-router-dom";
-import { fetchTopRated, fetchGenres, fetchMovieDetails } from "../../tmdb";
+import { fetchTopRated, fetchGenres } from "../../tmdb";
 
 import MovieList from "../../components/MovieList/MovieList";
 import MovieDetailsModal from "../../components/MovieDetailsModal/MovieDetailsModal";
@@ -13,7 +13,6 @@ import styles from "./HomePage.module.css";
 function HomePage() {
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState(null);
   const [loadedKey, setLoadedKey] = useState("");
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,19 +44,13 @@ function HomePage() {
       });
   }, [page, genreId, query]);
 
-  // Fetch movie details when navigating to /movie/:id
-  useEffect(() => {
-    if (!id) return;
-
-    fetchMovieDetails(id).then((data) => {
-      setSelectedMovie(data);
-    });
-  }, [id]);
-
   // Close modal
   function closeModal() {
-    setSelectedMovie(null);
     navigate("/");
+  }
+
+  function handleMovieClick(movieId) {
+    navigate(`/movie/${movieId}`);
   }
 
   return (
@@ -89,7 +82,7 @@ function HomePage() {
       </div>
 
       {/* Movie List */}
-      <MovieList movies={movies} loading={loading} />
+      <MovieList movies={movies} loading={loading} onMovieClick={handleMovieClick} />
 
       {/* Pagination */}
       <Pagination
@@ -100,8 +93,8 @@ function HomePage() {
       />
 
       {/* Modal */}
-      {selectedMovie && (
-        <MovieDetailsModal movie={selectedMovie} onClose={closeModal} />
+      {id && (
+        <MovieDetailsModal movieId={id} onClose={closeModal} />
       )}
     </div>
   );
