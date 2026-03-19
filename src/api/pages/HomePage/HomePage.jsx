@@ -14,6 +14,7 @@ function HomePage() {
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
   const [loadedKey, setLoadedKey] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -36,10 +37,12 @@ function HomePage() {
     fetchTopRated(page, genreId, query)
       .then((data) => {
         setMovies(data.results);
+        setTotalPages(data.total_pages || 1);
         setLoadedKey(currentRequestKey);
       })
       .catch(() => {
         setMovies([]);
+        setTotalPages(1);
         setLoadedKey(currentRequestKey);
       });
   }, [page, genreId, query]);
@@ -87,6 +90,7 @@ function HomePage() {
       {/* Pagination */}
       <Pagination
         currentPage={page}
+        totalPages={totalPages}
         onPageChange={(newPage) => {
           setSearchParams({ page: newPage, genre: genreId, query });
         }}
